@@ -17,7 +17,8 @@ class LocalRdd : public Rdd {
   virtual std::shared_ptr<Rdd>
       filter(std::function<bool (const Rdd*, const Tuple*)>) const;
   virtual std::shared_ptr<const Tuple> first() const;
-  virtual std::shared_ptr<Rdd> flatMap() const; // TODO?
+  virtual std::shared_ptr<Rdd> flatMap(
+      std::function<std::shared_ptr<const Tuple> (const Rdd*, std::shared_ptr<const Tuple>)>) const;
   virtual std::shared_ptr<Rdd> fold() const; // TODO?
   virtual std::shared_ptr<Rdd> sample(
       bool with_replacement, double fraction, int seed) const; // TODO?

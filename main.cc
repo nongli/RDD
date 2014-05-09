@@ -95,8 +95,13 @@ shared_ptr<const Tuple> LocalRdd::first() const {
   return data_[0];
 }
 
-shared_ptr<Rdd> LocalRdd::flatMap() const {
-  LocalRdd* result = new LocalRdd("Empty", schema_);
+shared_ptr<Rdd> LocalRdd::flatMap(
+    function<shared_ptr<const Tuple> (const Rdd*, shared_ptr<const Tuple>)> fn) const {
+  // TODO: how to get schema?
+  LocalRdd* result = new LocalRdd("flatMap", schema_);
+  for (int i = 0; i < data_.size(); ++i) {
+    result->Add(fn(this, data_[i]));
+  }
   return shared_ptr<Rdd>(reinterpret_cast<Rdd*>(result));
 }
 
@@ -176,6 +181,12 @@ int main(int argc, char** argv) {
       return reinterpret_cast<const Int32Datum*>(t->fields[0])->value() == 20;
     } );
   cout << ((LocalRdd*)filter.get())->PrintToTable();
+
+  shared_ptr<Rdd> flat_map = distinct->flatMap(
+    [](const Rdd*, shared_ptr<const Tuple> t) {
+      return t;
+    } );
+  cout << ((LocalRdd*)flat_map.get())->PrintToTable();
 
   printf("Done.\n");
   return 0;

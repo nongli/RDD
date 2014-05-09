@@ -183,10 +183,11 @@ class Rdd {
   virtual std::vector<std::pair<std::shared_ptr<const Tuple>, int64_t> >
       countByValue() const = 0;
   virtual std::shared_ptr<Rdd> distinct() const = 0;
-  virtual std::shared_ptr<Rdd>
-      filter(std::function<bool (const Rdd*, const Tuple*)>) const = 0;
+  virtual std::shared_ptr<Rdd> filter(
+      std::function<bool (const Rdd*, const Tuple*)>) const = 0;
   virtual std::shared_ptr<const Tuple> first() const = 0;
-  virtual std::shared_ptr<Rdd> flatMap() const = 0; // TODO?
+  virtual std::shared_ptr<Rdd> flatMap(
+      std::function<std::shared_ptr<const Tuple> (const Rdd*, std::shared_ptr<const Tuple>)>) const = 0;
   virtual std::shared_ptr<Rdd> fold() const = 0; // TODO?
   virtual std::shared_ptr<Rdd> sample(
       bool with_replacement, double fraction, int seed) const = 0; // TODO?
