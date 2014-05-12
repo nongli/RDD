@@ -1,6 +1,7 @@
 #ifndef RDD_H
 #define RDD_H
 
+#include <exception>
 #include <functional>
 #include <map>
 #include <memory>
@@ -53,7 +54,9 @@ class BasicDatum : public Datum {
     ss << v_;
     return ss.str();
   }
+
   T value() const { return v_; }
+  T& value() { return v_; }
 
  protected:
   virtual int EqualsInternal(const Datum* other) const {
@@ -173,7 +176,11 @@ struct Tuple {
 
 class Rdd {
  public:
-  virtual std::shared_ptr<Rdd> aggregate() const = 0;
+  virtual std::shared_ptr<Rdd> aggregate(
+      std::function<std::shared_ptr<Tuple> (const Rdd*,
+          std::shared_ptr<const Tuple> src, std::shared_ptr<Tuple> dst)> update,
+      std::function<std::shared_ptr<Tuple> (const Rdd*,
+          std::shared_ptr<const Tuple> src, std::shared_ptr<Tuple> dst)> merge) const = 0;
   virtual void cache() const = 0;
   virtual std::shared_ptr<Rdd> cartesian(const Rdd* other) const = 0;
   virtual void checkpoint() const = 0;
@@ -190,8 +197,9 @@ class Rdd {
       std::function<std::shared_ptr<const Tuple> (const Rdd*, std::shared_ptr<const Tuple>)>) const = 0;
   virtual std::shared_ptr<Rdd> fold() const = 0; // TODO?
   virtual std::shared_ptr<Rdd> sample(
-      bool with_replacement, double fraction, int seed) const = 0; // TODO?
+      bool with_replacement, double fraction, int seed = 0) const = 0;
   virtual std::shared_ptr<Rdd> subtract(std::shared_ptr<Rdd>) const = 0;
+  virtual std::shared_ptr<Rdd> Union(std::shared_ptr<Rdd>) const = 0;
 
   virtual ~Rdd() {}
 

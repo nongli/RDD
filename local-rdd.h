@@ -5,7 +5,11 @@
 
 class LocalRdd : public Rdd {
  public:
-  virtual std::shared_ptr<Rdd> aggregate() const;
+  virtual std::shared_ptr<Rdd> aggregate(
+      std::function<std::shared_ptr<Tuple> (const Rdd*,
+          std::shared_ptr<const Tuple> src, std::shared_ptr<Tuple> dst)> update,
+      std::function<std::shared_ptr<Tuple> (const Rdd*,
+          std::shared_ptr<const Tuple> src, std::shared_ptr<Tuple> dst)> merge) const;
   virtual void cache() const;
   virtual std::shared_ptr<Rdd> cartesian(const Rdd* other) const;
   virtual void checkpoint() const;
@@ -21,8 +25,9 @@ class LocalRdd : public Rdd {
       std::function<std::shared_ptr<const Tuple> (const Rdd*, std::shared_ptr<const Tuple>)>) const;
   virtual std::shared_ptr<Rdd> fold() const; // TODO?
   virtual std::shared_ptr<Rdd> sample(
-      bool with_replacement, double fraction, int seed) const; // TODO?
+      bool with_replacement, double fraction, int seed = 0) const;
   virtual std::shared_ptr<Rdd> subtract(std::shared_ptr<Rdd>) const;
+  virtual std::shared_ptr<Rdd> Union(std::shared_ptr<Rdd>) const;
 
  public:
   LocalRdd(const std::string& name, std::shared_ptr<Schema> schema);
